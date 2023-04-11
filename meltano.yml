@@ -11,10 +11,8 @@ plugins:
     - catalog
     - discover
     config:
-      api_key: API-KEY
-      app_key: APP-KEY
-      start_date: '2022-10-05T00:00:00Z'
-  
+      username: WORKDAYUSERNAME
+      password: WORKDAYPASSWORD
   loaders:
   - name: target-jsonl
     variant: andyh1203
