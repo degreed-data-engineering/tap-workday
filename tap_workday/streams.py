@@ -50,13 +50,10 @@ class HumanResources(TapWorkdayStream):
 
     # Optional: If using schema_filepath, remove the propertyList schema method below
     schema = th.PropertiesList(
-        th.Property(
-            "wd_Worker_Data",
-            th.ObjectType(
-                th.Property("wd_Worker_ID'", th.StringType),
+
+                th.Property("wd_Worker_ID", th.StringType),
                 th.Property("wd_User_ID", th.StringType),
-            )
-        ),
+   
 
     ).to_dict()
     # Overwrite GET here by updating rest_method
@@ -157,6 +154,8 @@ class HumanResources(TapWorkdayStream):
         new_json_obj = self.replace_key_names(json_obj)
         new_json_str = json.dumps(new_json_obj['env_Envelope']["env_Body"]["wd_Get_Workers_Response"]["wd_Response_Data"]["wd_Worker"])
         json_dict = json.loads(new_json_str)
+
+        logging.info(json_dict)
         yield from extract_jsonpath(self.records_jsonpath, input=json_dict)
         #yield from extract_jsonpath(self.records_jsonpath, input=new_json_str)
     
