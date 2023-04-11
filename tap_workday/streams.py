@@ -46,7 +46,7 @@ class HumanResources(TapWorkdayStream):
     #primary_keys = ["id"]
     replication_key = None
     primary_keys = ["wd_Worker_ID"]
-    records_jsonpath = "$.wd_Worker_Data[*]"
+    records_jsonpath = "$[*].wd_Worker_Data"
 
     # Optional: If using schema_filepath, remove the propertyList schema method below
     schema = th.PropertiesList(
