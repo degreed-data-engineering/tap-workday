@@ -1,5 +1,0 @@
-{"type": "SCHEMA", "stream": "humanresources", "schema": {"properties": {"wd_Worker_ID": {"type": ["string", "null"]}, "wd_User_ID": {"type": ["string", "null"]}}, "type": "object"}, "key_properties": ["wd_Worker_ID"]}
-{"type": "RECORD", "stream": "humanresources", "record": {"wd_Worker_ID": "21001", "wd_User_ID": "lmcneil"}, "time_extracted": "2023-04-11T23:01:30.012486Z"}
-{"type": "STATE", "value": {"bookmarks": {"humanresources": {"starting_replication_value": null}}}}
-{"type": "RECORD", "stream": "humanresources", "record": {"wd_Worker_ID": "21002", "wd_User_ID": "smorgan"}, "time_extracted": "2023-04-11T23:01:30.013304Z"}
-{"type": "STATE", "value": {"bookmarks": {"humanresources": {}}}}
