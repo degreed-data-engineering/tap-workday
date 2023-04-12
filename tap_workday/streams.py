@@ -41,14 +41,17 @@ class TapWorkdayStream(RESTStream):
         return SimpleAuthenticator(stream=self, auth_headers=http_headers)
 
 class HumanResources(TapWorkdayStream):
+    rest_method = "POST"
     name = "humanresources" # Stream name 
     path = "/ccx/service/degreed_dpt1/Human_Resources/v39.2" # API endpoint after base_url 
     #primary_keys = ["id"]
     replication_key = None
     primary_keys = ["wd_Worker_ID"]
     records_jsonpath = "$[*].wd_Worker_Data"
+    # pagination
+    current_page = 1
+    total_pages = 0 
 
-    # Optional: If using schema_filepath, remove the propertyList schema method below
     schema = th.PropertiesList(
 
                 th.Property("wd_Worker_ID", th.StringType),
@@ -103,12 +106,9 @@ class HumanResources(TapWorkdayStream):
                         th.Property("wd_Simplified_View", th.StringType),
                     )
                 )
-
-   
-
     ).to_dict()
-    # Overwrite GET here by updating rest_method
-    rest_method = "POST"
+
+    
 
     def prepare_request_payload(
         self, context: Optional[dict], next_page_token: Optional[Any]
@@ -136,8 +136,8 @@ class HumanResources(TapWorkdayStream):
                                 <bsvc:Exclude_Contingent_Workers>false</bsvc:Exclude_Contingent_Workers>
                              </bsvc:Request_Criteria>
                                   <bsvc:Response_Filter>
-                                    <bsvc:Page>1</bsvc:Page>
-                                    <bsvc:Count>2</bsvc:Count>
+                                    <bsvc:Page>{page_token}</bsvc:Page>
+                                    <bsvc:Count>500</bsvc:Count>
                              </bsvc:Response_Filter>
                              <bsvc:Response_Group>
                                 <bsvc:Include_Personal_Information>true</bsvc:Include_Personal_Information>
@@ -149,11 +149,8 @@ class HumanResources(TapWorkdayStream):
                     </soapenv:Envelope>
 
         """.format(username=self.config.get("username"),
-                   password=self.config.get("password"))
-        logging.info("##PR##: body")
-        logging.info(body)
-
-        
+                   password=self.config.get("password"),
+                   page_token=self.current_page)
         return body
 
     def prepare_request(
@@ -183,6 +180,16 @@ class HumanResources(TapWorkdayStream):
         )
         return request
     
+    def get_next_page_token(
+        self, response: requests.Response, previous_token: Optional[Any]
+    ) -> Optional[Any]:
+        """Return a token for identifying next page or None if no more pages."""
+        if self.current_page > self.total_pages: 
+            return None
+        else:
+            next_page_token = self.current_page
+            return next_page_token
+
     def replace_key_names(self, obj):
         if isinstance(obj, dict):
             return {key.replace(':', '_'): self.replace_key_names(val) for key, val in obj.items()}
@@ -200,10 +207,12 @@ class HumanResources(TapWorkdayStream):
         json_response = json.dumps(xml_dict)
         json_obj = json.loads(json_response)
         new_json_obj = self.replace_key_names(json_obj)
+        self.total_pages = int(new_json_obj['env_Envelope']["env_Body"]["wd_Get_Workers_Response"]["wd_Response_Results"]["wd_Total_Pages"])
+        self.current_page = self.current_page + 1 
+
         new_json_str = json.dumps(new_json_obj['env_Envelope']["env_Body"]["wd_Get_Workers_Response"]["wd_Response_Data"]["wd_Worker"])
         json_dict = json.loads(new_json_str)
 
-        logging.info(json_dict)
         yield from extract_jsonpath(self.records_jsonpath, input=json_dict)
-        #yield from extract_jsonpath(self.records_jsonpath, input=new_json_str)
+
     
