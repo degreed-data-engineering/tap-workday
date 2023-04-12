@@ -53,6 +53,57 @@ class HumanResources(TapWorkdayStream):
 
                 th.Property("wd_Worker_ID", th.StringType),
                 th.Property("wd_User_ID", th.StringType),
+                th.Property(
+                    "wd_Personal_Data",
+                    th.ObjectType(
+                        th.Property(
+                            "wd_Name_Data",
+                            th.ObjectType(
+                                th.Property(
+                                    "wd_Legal_Name_Data",
+                                    th.ObjectType(
+                                        th.Property(
+                                            "wd_Name_Detail_Data",
+                                            th.ObjectType(
+                                                th.Property("@wd_Formatted_Name", th.StringType),
+                                                th.Property("@wd_Reporting_Name", th.StringType),
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                ),
+                th.Property(
+                    "wd_Employment_Data",
+                    th.ObjectType(
+                        th.Property(
+                            "wd_Worker_Job_Data",
+                            th.ObjectType(
+                                th.Property("@wd_Primary_Job", th.StringType),
+                                th.Property(
+                                    "wd_Position_Data",
+                                    th.ObjectType(
+                                        th.Property("@wd_Effective_Date", th.StringType),
+                                        th.Property("wd_Position_ID", th.StringType),
+                                        th.Property("wd_Position_Title", th.StringType),
+                                        th.Property("wd_Start_Date", th.StringType),
+                                    )
+                                )
+
+                            )
+                        )
+                    )
+                ),
+                th.Property(
+                    "wd_User_Account_Data",
+                    th.ObjectType(
+                        th.Property("wd_User_Name", th.StringType),
+                        th.Property("wd_Simplified_View", th.StringType),
+                    )
+                )
+
    
 
     ).to_dict()
@@ -143,11 +194,8 @@ class HumanResources(TapWorkdayStream):
     def parse_response(self, response: requests.Response) -> Iterable[dict]:
         """Parse the response and return an iterator of result records."""
         logging.info("##PR## response:")
-        
-
-        xml_str = response.text
         # XML to dict
-        xml_dict = xmltodict.parse(xml_str)
+        xml_dict = xmltodict.parse(response.text)
         # dict to JSON
         json_response = json.dumps(xml_dict)
         json_obj = json.loads(json_response)
