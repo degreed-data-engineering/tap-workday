@@ -1,0 +1,17 @@
+{
+        "type": "object",
+        "properties": {
+                "wd_Worker_ID": {
+                        "type": [
+                                "integer",
+                                "null"
+                        ]
+                },
+                "wd_User_ID": {
+                        "type": [
+                                "string",
+                                "null"
+                        ]
+                }
+        }
+}

@@ -1,0 +1,25 @@
+version: 1
+send_anonymous_usage_stats: true
+project_id: 4935d052-aee1-46fa-89f0-a94cdc080064
+plugins:
+  extractors:
+  - name: tap-workday
+    namespace: tap_workday
+    executable: ./tap-workday.sh
+    capabilities:
+    - state
+    - catalog
+    - discover
+    config:
+      username: WORKDAYUSERNAME
+      password: WORKDAYPASSWORD
+  loaders:
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+environments:
+- name: dev
+  config:
+    plugins:
+      extractors:
+      - name: tap-workday
